@@ -47,20 +47,30 @@ func main() {
 		Models: data.New(client),
 	}
 
-	app.serve()
-}
+	// go app.serve()
 
-func (app *Config) serve() {
 	srv := http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
 	}
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Panic("Couldn't start logger service")
 	}
 }
+
+// func (app *Config) serve() {
+// 	srv := http.Server{
+// 		Addr:    fmt.Sprintf(":%s", webPort),
+// 		Handler: app.routes(),
+// 	}
+
+// 	err := srv.ListenAndServe()
+// 	if err != nil {
+// 		log.Panic("Couldn't start logger service")
+// 	}
+// }
 
 func connectToMongo() (*mongo.Client, error) {
 	//create connection options
