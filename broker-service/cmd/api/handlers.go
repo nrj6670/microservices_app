@@ -10,6 +10,12 @@ import (
 type RequestPayload struct {
 	Action string      `json:"action"`
 	Auth   AuthPayload `json:"auth,omitempty"`
+	Log    LogPayload  `json:"log,omitempty"`
+}
+
+type LogPayload struct {
+	Name string `json:"name"`
+	Data string `json:"data"`
 }
 
 type AuthPayload struct {
@@ -38,9 +44,39 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	switch requestPayload.Action {
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
+	case "log":
+		app.log(w, requestPayload.Log)
 	default:
 		app.errorJSON(w, errors.New("unknown action"))
 	}
+}
+
+func (app *Config) log(w http.ResponseWriter, l LogPayload) {
+	jsonData, _ := json.MarshalIndent(l, "", "\t")
+
+	logServiceUrl := "http://log-service/log"
+
+	request, err := http.NewRequest(http.MethodPost, logServiceUrl, bytes.NewBuffer(jsonData))
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+
+	response, err := client.Do(request)
+	if err != nil {
+		app.errorJSON(w, errors.New("Error writing log"))
+		return
+	}
+	defer response.Body.Close()
+
+	var payload jsonResponse
+
+	payload.Error = false
+	payload.Message = "logged"
+	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
 func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
