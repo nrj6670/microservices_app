@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -34,8 +33,8 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//log authenticate request
-	err = app.logRequest("authentication log", fmt.Sprintf("logged in user %s", requestPayload.Email))
+	// log authentication
+	err = app.logRequest("authentication", fmt.Sprintf("%s logged in", user.Email))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -60,23 +59,18 @@ func (app *Config) logRequest(name, data string) error {
 	entry.Data = data
 
 	jsonData, _ := json.MarshalIndent(entry, "", "\t")
+	logServiceURL := "http://logger-service/log"
 
-	//logger-service url
-	logSvcUrl := "http://logger-service/log"
-
-	request, err := http.NewRequest(http.MethodPost, logSvcUrl, bytes.NewBuffer(jsonData))
+	request, err := http.NewRequest("POST", logServiceURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		log.Println("Error creating log request:", err)
 		return err
 	}
 
 	client := &http.Client{}
-	response, err := client.Do(request)
+	_, err = client.Do(request)
 	if err != nil {
-		log.Println("Error while creating log request:", err)
 		return err
 	}
-	defer response.Body.Close()
 
 	return nil
 }

@@ -19,24 +19,25 @@ const (
 	gRpcPort = "50001"
 )
 
+var client *mongo.Client
+
 type Config struct {
 	Models data.Models
 }
 
-var client *mongo.Client
-
 func main() {
+	// connect to mongo
 	mongoClient, err := connectToMongo()
 	if err != nil {
 		log.Panic(err)
 	}
 	client = mongoClient
 
-	//create a context in order to disconnect
+	// create a context in order to disconnect
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	//close connection
+	// close connection
 	defer func() {
 		if err = client.Disconnect(ctx); err != nil {
 			panic(err)
@@ -47,44 +48,49 @@ func main() {
 		Models: data.New(client),
 	}
 
+	// start web server
 	// go app.serve()
-
-	srv := http.Server{
+	log.Println("Starting service on port", webPort)
+	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
 	}
 
 	err = srv.ListenAndServe()
 	if err != nil {
-		log.Panic("Couldn't start logger service")
+		log.Panic()
 	}
+
 }
 
 // func (app *Config) serve() {
-// 	srv := http.Server{
-// 		Addr:    fmt.Sprintf(":%s", webPort),
+// 	srv := &http.Server{
+// 		Addr: fmt.Sprintf(":%s", webPort),
 // 		Handler: app.routes(),
 // 	}
 
 // 	err := srv.ListenAndServe()
 // 	if err != nil {
-// 		log.Panic("Couldn't start logger service")
+// 		log.Panic()
 // 	}
 // }
 
 func connectToMongo() (*mongo.Client, error) {
-	//create connection options
+	// create connection options
 	clientOptions := options.Client().ApplyURI(mongoURL)
 	clientOptions.SetAuth(options.Credential{
 		Username: "admin",
 		Password: "password",
 	})
 
-	//connect
+	// connect
 	c, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		log.Println("Error connecting  to mongoDB: ", err)
+		log.Println("Error connecting:", err)
 		return nil, err
 	}
+
+	log.Println("Connected to mongo!")
+
 	return c, nil
 }
