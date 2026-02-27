@@ -59,6 +59,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+    restart: always
 
   postgres:
     image: 'postgres:14.0'

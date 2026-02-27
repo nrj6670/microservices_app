@@ -38,7 +38,7 @@ func main() {
 
 func connect() (*amqp.Connection, error) {
 	var counts int64
-	retryCount := int64(5)
+	retryCount := int64(10)
 	var backOff = 1 * time.Second
 	var connection *amqp.Connection
 
@@ -54,7 +54,7 @@ func connect() (*amqp.Connection, error) {
 			break
 		}
 
-		if counts > 5 {
+		if counts == retryCount {
 			fmt.Println(err)
 			return nil, err
 		}
