@@ -1,0 +1,6 @@
+# Ignore all contents, but keep the directory placeholder files
+project/db-data/mongo/*
+!project/db-data/mongo/.gitkeep
+
+project/db-data/postgres/*
+!project/db-data/postgres/.gitkeep
