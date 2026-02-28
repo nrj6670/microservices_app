@@ -11,6 +11,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+// main connects to RabbitMQ, creates a consumer, and listens for log/auth events.
 func main() {
 	// try to connect to rabbitmq
 	rabbitConn, err := connect()
@@ -36,6 +37,7 @@ func main() {
 	}
 }
 
+// connect dials RabbitMQ with exponential backoff and returns the connection.
 func connect() (*amqp.Connection, error) {
 	var counts int64
 	retryCount := int64(10)

@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
+// routes configures chi router with CORS, heartbeat, and broker endpoints.
 func (app *Config) routes() http.Handler {
 	mux := chi.NewRouter()
 

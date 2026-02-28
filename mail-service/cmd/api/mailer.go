@@ -31,6 +31,7 @@ type Message struct {
 	DataMap     map[string]any
 }
 
+// SendSMTPMessage builds HTML/plain messages, connects to SMTP, and sends the email.
 func (m *Mail) SendSMTPMessage(msg Message) error {
 	if msg.From == "" {
 		msg.From = m.FromAddress
@@ -112,6 +113,7 @@ func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
 	return formattedMessage, nil
 }
 
+// inlineCSS uses premailer to inline CSS into the HTML string for email clients.
 func (m *Mail) inlineCSS(s string) (string, error) {
 	options := premailer.Options{
 		RemoveClasses:     false,
@@ -151,6 +153,7 @@ func (m *Mail) buildPlainTextMessage(msg Message) (string, error) {
 	return plainMessage, nil
 }
 
+// getEncryption maps a string (tls, ssl, none) to the mail package's Encryption type.
 func (m *Mail) getEncryption(s string) mail.Encryption {
 	switch s {
 	case "tls":

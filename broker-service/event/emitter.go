@@ -10,6 +10,7 @@ type Emitter struct {
 	connection *amqp.Connection
 }
 
+// setup declares the logs_topic exchange on a new channel.
 func (e *Emitter) setup() error {
 	channel, err := e.connection.Channel()
 	if err != nil {
@@ -47,6 +48,7 @@ func (e *Emitter) Push(event, severity string) error {
 	return nil
 }
 
+// NewEventEmitter creates an Emitter and declares the logs_topic exchange.
 func NewEventEmitter(conn *amqp.Connection) (Emitter, error) {
 	emitter := Emitter{
 		connection: conn,

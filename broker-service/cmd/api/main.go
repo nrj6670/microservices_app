@@ -13,10 +13,12 @@ import (
 
 const webPort = "80"
 
+// Config holds application dependencies (e.g. RabbitMQ connection) used by HTTP handlers.
 type Config struct {
 	Rabbit *amqp.Connection
 }
 
+// main starts the broker HTTP server and connects to RabbitMQ with retries.
 func main() {
 	// try to connect to rabbitmq
 	rabbitConn, err := connect()
@@ -45,6 +47,7 @@ func main() {
 	}
 }
 
+// connect dials RabbitMQ with exponential backoff and returns the connection.
 func connect() (*amqp.Connection, error) {
 	var counts int64
 	retryCount := int64(10)

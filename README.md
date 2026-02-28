@@ -1,0 +1,93 @@
+# Microservices & Front-End Deployment
+
+This repo contains a Go-based microservices stack and a front-end app. Use the **Makefile** in `project/` to build and run everything.
+
+## Prerequisites
+
+- **Docker & Docker Compose** – for running services in containers
+- **Go 1.21+** – for building binaries locally (optional)
+- **Make** – for running the commands below
+
+## Quick Start (Docker)
+
+From the **project** directory:
+
+```bash
+cd project
+make up_build
+```
+
+This will:
+
+1. Build Linux binaries for broker, auth, logger, mail, and listener
+2. Bring down any existing stack
+3. Build and start all Docker Compose services (broker, auth, logger, mailer, listener, Postgres, Mongo, RabbitMQ, MailHog)
+
+To start existing images without rebuilding:
+
+```bash
+cd project
+make up
+```
+
+To stop the stack:
+
+```bash
+cd project
+make down
+```
+
+## Makefile Targets (run from `project/`)
+
+| Command        | Description |
+|----------------|-------------|
+| `make up`      | Start all containers in the background (no rebuild) |
+| `make up_build` | Build all service binaries, then build and start all containers |
+| `make down`    | Stop and remove Docker Compose containers |
+| `make build_broker`   | Build broker-service Linux binary only |
+| `make build_auth`     | Build authentication-service Linux binary only |
+| `make build_logger`   | Build logger-service Linux binary only |
+| `make build_mail`     | Build mail-service Linux binary only |
+| `make build_listener` | Build listener-service Linux binary only |
+| `make build_front`    | Build front-end binary (current OS) |
+| `make start`   | Build and run the front-end app (e.g. `./frontApp`) in the background |
+| `make stop`    | Stop the front-end app process |
+
+## Service Ports (when using Docker Compose)
+
+- **Broker**: `8080` → 80 (internal)
+- **Authentication**: `8081` → 80 (internal)
+- **Postgres**: `5432`
+- **Mongo**: `27017`
+- **RabbitMQ**: `5672`
+- **MailHog SMTP**: `1025` (API/ui: `8025`)
+
+## Front-End (standalone)
+
+To build and run the front-end without Docker:
+
+```bash
+cd project
+make build_front
+make start
+```
+
+To stop it:
+
+```bash
+make stop
+```
+
+The front-end serves on port 80 by default.
+
+## Project Layout
+
+- **project/** – Docker Compose, Makefile, and db-data volumes
+- **broker-service/** – API gateway / broker
+- **authentication-service/** – User auth (Postgres)
+- **logger-service/** – Log storage (MongoDB, RPC, gRPC)
+- **mail-service/** – SMTP mail sender
+- **listener-service/** – RabbitMQ consumer (log/auth events)
+- **front-end/** – Web UI
+
+Each service has its own README with a description and code structure.

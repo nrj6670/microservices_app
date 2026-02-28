@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// Authenticate validates email/password against the DB and logs the event via the logger service.
 func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 	var requestPayload struct {
 		Email    string `json:"email"`
@@ -49,6 +50,7 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
+// logRequest sends a log entry (name, data) to the logger-service via HTTP POST.
 func (app *Config) logRequest(name, data string) error {
 	var entry struct {
 		Name string `json:"name"`

@@ -15,6 +15,7 @@ type Consumer struct {
 	queueName string
 }
 
+// NewConsumer creates a Consumer and sets up the logs_topic exchange.
 func NewConsumer(conn *amqp.Connection) (Consumer, error) {
 	consumer := Consumer{
 		conn: conn,
@@ -28,6 +29,7 @@ func NewConsumer(conn *amqp.Connection) (Consumer, error) {
 	return consumer, nil
 }
 
+// setup declares the logs_topic exchange on a new channel.
 func (c *Consumer) setup() error {
 	channel, err := c.conn.Channel()
 	if err != nil {
@@ -42,6 +44,7 @@ type Payload struct {
 	Data string `json:"data"`
 }
 
+// Listen binds to the given routing keys and handles messages (log/event -> logger-service).
 func (c *Consumer) Listen(topics []string) error {
 	ch, err := c.conn.Channel()
 	if err != nil {
@@ -89,6 +92,7 @@ func (c *Consumer) Listen(topics []string) error {
 	return nil
 }
 
+// handlePayload dispatches by name: log/event -> logEvent; auth reserved for future use.
 func handlePayload(payload Payload) {
 	switch payload.Name {
 	case "log", "event":
@@ -108,6 +112,7 @@ func handlePayload(payload Payload) {
 	}
 }
 
+// logEvent POSTs the payload to the logger-service /log endpoint.
 func logEvent(entry Payload) error {
 	jsonData, _ := json.MarshalIndent(entry, "", "\t")
 

@@ -10,6 +10,7 @@ type JSONPayload struct {
 	Data string `json:"data"`
 }
 
+// WriteLog reads a JSON payload (name, data) and inserts a log entry via the data layer.
 func (app *Config) WriteLog(w http.ResponseWriter, r *http.Request) {
 	// read json into var
 	var requestPayload JSONPayload

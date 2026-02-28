@@ -8,12 +8,14 @@ import (
 	"strconv"
 )
 
+// Config holds the mailer implementation used by HTTP handlers.
 type Config struct {
 	Mailer Mail
 }
 
 const webPort = "80"
 
+// main builds the mail config from env and starts the HTTP server on webPort.
 func main() {
 	app := Config{
 		Mailer: createMail(),
@@ -30,6 +32,7 @@ func main() {
 	}
 }
 
+// createMail builds a Mail struct from environment variables (MAIL_*, FROM_*).
 func createMail() Mail {
 	port, _ := strconv.Atoi(os.Getenv("MAIL_PORT"))
 	mail := Mail{

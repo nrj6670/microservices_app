@@ -23,10 +23,12 @@ const (
 
 var client *mongo.Client
 
+// Config holds application dependencies (e.g. data models) for the logger service.
 type Config struct {
 	Models data.Models
 }
 
+// main connects to MongoDB, registers RPC and gRPC servers, and starts the HTTP server.
 func main() {
 	// connect to mongo
 	mongoClient, err := connectToMongo()
@@ -72,6 +74,7 @@ func main() {
 
 }
 
+// rpcListen starts the Go RPC server on rpcPort and serves RPCServer.LogInfo.
 func (app *Config) rpcListen() error {
 	log.Println("Starting RPC server on port", rpcPort)
 	listen, err := net.Listen(
@@ -92,6 +95,7 @@ func (app *Config) rpcListen() error {
 	}
 }
 
+// connectToMongo connects to MongoDB using mongoURL and configured credentials.
 func connectToMongo() (*mongo.Client, error) {
 	// create connection options
 	clientOptions := options.Client().ApplyURI(mongoURL)

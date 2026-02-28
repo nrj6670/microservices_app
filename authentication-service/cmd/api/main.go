@@ -18,11 +18,13 @@ const webPort = "80"
 
 var counts int64
 
+// Config holds the DB connection and data models for the authentication service.
 type Config struct {
 	DB *sql.DB
 	Models data.Models
 }
 
+// main connects to Postgres (with retries), then starts the HTTP server.
 func main() {
 	log.Println("Starting authentication service")
 
@@ -49,6 +51,7 @@ func main() {
 	}
 }
 
+// openDB opens a PostgreSQL connection using the given DSN and pings it.
 func openDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
@@ -63,6 +66,7 @@ func openDB(dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
+// connectToDB connects to Postgres using DSN from env, with retries and backoff.
 func connectToDB() *sql.DB {
 	dsn := os.Getenv("DSN")
 

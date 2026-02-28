@@ -41,6 +41,7 @@ type MailPayload struct {
 	Message string `json:"message"`
 }
 
+// Broker responds with a simple JSON payload indicating the broker is reachable.
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
 	payload := jsonResponse{
 		Error:   false,
@@ -77,6 +78,7 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// logItem forwards a log entry to the logger-service via HTTP POST.
 func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
 	jsonData, _ := json.MarshalIndent(entry, "", "\t")
 
@@ -112,7 +114,7 @@ func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
 
 }
 
-// authenticate calls the authentication microservice and sends back the appropriate response
+// authenticate calls the authentication microservice and returns success or invalid-credentials JSON.
 func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 	// create some json we'll send to the auth microservice
 	jsonData, _ := json.MarshalIndent(a, "", "\t")
@@ -164,6 +166,7 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
+// sendMail forwards mail payload to the mailer-service via HTTP and returns the result.
 func (app *Config) sendMail(w http.ResponseWriter, m MailPayload) {
 	jsonData, _ := json.MarshalIndent(m, "", "\t")
 
@@ -197,6 +200,7 @@ func (app *Config) sendMail(w http.ResponseWriter, m MailPayload) {
 	app.writeJSON(w, http.StatusAccepted, resp)
 }
 
+// logEventViaRabbit publishes a log payload to the RabbitMQ logs_topic exchange.
 func (app *Config) logEventViaRabbit(w http.ResponseWriter, l LogPayload) {
 	err := app.pushToQueue(l.Name, l.Data)
 	if err != nil {
@@ -235,6 +239,7 @@ type RPCPayload struct {
 	Data string
 }
 
+// logItemViaRPC sends the log payload to the logger-service via Go RPC (TCP) and returns the result.
 func (app *Config) logItemViaRPC(w http.ResponseWriter, l LogPayload) {
 	client, err := rpc.Dial("tcp", "logger-service:5001")
 	if err != nil {
@@ -262,6 +267,7 @@ func (app *Config) logItemViaRPC(w http.ResponseWriter, l LogPayload) {
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
+// LogViaGRPC reads a JSON payload and writes the log entry via gRPC to the logger-service.
 func (app *Config) LogViaGRPC(w http.ResponseWriter, r *http.Request) {
 	var requestPayload RequestPayload
 

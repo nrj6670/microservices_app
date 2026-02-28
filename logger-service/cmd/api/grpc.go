@@ -16,6 +16,7 @@ type LogServer struct {
 	Models data.Models
 }
 
+// WriteLog implements the gRPC LogService: inserts the log entry and returns a result message.
 func (l *LogServer) WriteLog(ctx context.Context, req *logs.LogRequest) (*logs.LogResponse, error) {
 	input := req.GetLogEntry()
 
@@ -36,6 +37,7 @@ func (l *LogServer) WriteLog(ctx context.Context, req *logs.LogRequest) (*logs.L
 	return res, nil
 }
 
+// gRPCListen starts the gRPC server on gRpcPort and registers the LogService.
 func (app *Config) gRPCListen() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", gRpcPort))
 	if err != nil {

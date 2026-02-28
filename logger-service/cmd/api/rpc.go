@@ -14,6 +14,7 @@ type RPCPayload struct {
 	Data string
 }
 
+// LogInfo is the RPC method that writes the payload to the logs collection and sets resp.
 func (r *RPCServer) LogInfo(payload RPCPayload, resp *string) error {
 	collection := client.Database("logs").Collection("logs")
 	_, err := collection.InsertOne(context.TODO(), data.LogEntry{

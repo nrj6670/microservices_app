@@ -13,6 +13,7 @@ import (
 
 var client *mongo.Client
 
+// New creates a Models instance with the given MongoDB client.
 func New(mongo *mongo.Client) Models {
 	client = mongo
 
@@ -33,6 +34,7 @@ type LogEntry struct {
 	UpdatedAt time.Time `bson:"updated_at" json:"updated_at"`
 }
 
+// Insert adds a new log entry to the logs collection with CreatedAt/UpdatedAt set to now.
 func (l *LogEntry) Insert(entry LogEntry) error {
 	collection := client.Database("logs").Collection("logs")
 
@@ -50,6 +52,7 @@ func (l *LogEntry) Insert(entry LogEntry) error {
 	return nil
 }
 
+// All returns all log entries from the logs collection, sorted by created_at descending.
 func (l *LogEntry) All() ([]*LogEntry, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -103,6 +106,7 @@ func (l *LogEntry) GetOne(id string) (*LogEntry, error) {
 	return &entry, nil
 }
 
+// DropCollection drops the logs collection.
 func (l *LogEntry) DropCollection() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -116,6 +120,7 @@ func (l *LogEntry) DropCollection() error {
 	return nil
 }
 
+// Update updates the log document matching l.ID with name, data, and updated_at.
 func (l *LogEntry) Update() (*mongo.UpdateResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -131,10 +136,10 @@ func (l *LogEntry) Update() (*mongo.UpdateResult, error) {
 		ctx,
 		bson.M{"_id": docID},
 		bson.D{
-			{"$set", bson.D{
-				{"name", l.Name},
-				{"data", l.Data},
-				{"updated_at", time.Now()},
+			{Key: "$set", Value: bson.D{
+				{Key: "name", Value: l.Name},
+				{Key: "data", Value: l.Data},
+				{Key: "updated_at", Value: time.Now()},
 			}},
 		},
 	)

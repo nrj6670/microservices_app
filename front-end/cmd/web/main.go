@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// main registers the root handler and starts the HTTP server on port 80.
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		render(w, "test.page.gohtml")
@@ -19,6 +20,7 @@ func main() {
 	}
 }
 
+// render parses the given template with base layout and partials, then executes it.
 func render(w http.ResponseWriter, t string) {
 
 	partials := []string{
